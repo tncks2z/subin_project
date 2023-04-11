@@ -2,7 +2,8 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useState } from 'react';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import './App.css';
-import Map from './Map';
+import MapContainer from './Mapcontainer';
+import SearchPlace from './Searchplace';
 
 function App() {
 	const menu1 = ['육식', '육식+채식'];
@@ -48,7 +49,7 @@ function App() {
 							) : null}
 						</Container>
 					}></Route>
-				<Route path='/map' element={<Map />}></Route>
+				<Route path='/map' element={<SearchPlace />}></Route>
 			</Routes>
 		</div>
 	);
