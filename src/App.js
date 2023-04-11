@@ -1,6 +1,8 @@
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useState } from 'react';
+import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import './App.css';
+import Map from './Map';
 
 function App() {
 	const menu1 = ['육식', '육식+채식'];
@@ -17,29 +19,37 @@ function App() {
 			alert('메뉴를 선택해주세요');
 		}
 	};
+	const navigate = useNavigate();
 	return (
 		<div className='App'>
-			<Container className='text-center mt-5'>
-				<h1>식사메뉴 랜덤 추천</h1>
-				<h3>오늘 뭐 먹지? 점심 뭐 먹지? 저녁 뭐 먹지?</h3>
-				<div className='user-pick-list'>
-					<Menu1 menu1={menu1} setUserPick1={setUserPick1}></Menu1>
-				</div>
-				<div className='user-pick-list'>
-					<Menu2 menu2={menu2} setUserPick2={setUserPick2}></Menu2>
-				</div>
-				<div className='user-pick-list'>
-					<Menu3 menu3={menu3} setUserPick3={setUserPick3}></Menu3>
-				</div>
-				<Button onClick={showMenu}>메뉴를 골라줘!</Button>
-				{isPicked ? (
-					<div className='result'>
-						<h2>{userPick1}</h2>
-						<h2>{userPick2}</h2>
-						<h2>{userPick3}</h2>
-					</div>
-				) : null}
-			</Container>
+			<Routes>
+				<Route
+					path='/'
+					element={
+						<Container className='text-center mt-5'>
+							<h1>식사메뉴 랜덤 추천</h1>
+							<h3>오늘 뭐 먹지? 점심 뭐 먹지? 저녁 뭐 먹지?</h3>
+							<div className='user-pick-list'>
+								<Menu1 menu1={menu1} setUserPick1={setUserPick1}></Menu1>
+							</div>
+							<div className='user-pick-list'>
+								<Menu2 menu2={menu2} setUserPick2={setUserPick2}></Menu2>
+							</div>
+							<div className='user-pick-list'>
+								<Menu3 menu3={menu3} setUserPick3={setUserPick3}></Menu3>
+							</div>
+							<Button onClick={showMenu}>메뉴를 골라줘!</Button>
+							{isPicked ? (
+								<div className='result' onClick={() => navigate('/map')}>
+									<h2>{userPick1}</h2>
+									<h2>{userPick2}</h2>
+									<h2>{userPick3}</h2>
+								</div>
+							) : null}
+						</Container>
+					}></Route>
+				<Route path='/map' element={<Map />}></Route>
+			</Routes>
 		</div>
 	);
 }
