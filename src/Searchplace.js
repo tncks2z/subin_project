@@ -3,9 +3,8 @@ import MapContainer from './Mapcontainer';
 import { Form, Button, InputGroup } from 'react-bootstrap';
 
 const SearchPlace = () => {
-	const [inputText, setInputText] = useState('');
+	const [inputText, setInputText] = useState(`${localStorage.getItem('userLocation')} ${localStorage.getItem('userMenu')}`);
 	const [place, setPlace] = useState('');
-
 	const onChange = (e) => {
 		setInputText(e.target.value);
 	};
@@ -13,7 +12,7 @@ const SearchPlace = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		setPlace(inputText);
-		setInputText('');
+		setInputText(inputText);
 	};
 
 	return (
