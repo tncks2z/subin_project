@@ -3,8 +3,11 @@ import { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import './App.css';
 import SearchPlace from './Searchplace';
+import { changeLocation, changeMenu } from './store';
+import { useDispatch } from 'react-redux';
 const { kakao } = window;
 function App() {
+	const dispatch = useDispatch();
 	const menu1 = ['육식', '육식+채식'];
 	const menu2 = ['전체', '식사', '요리'];
 	const menu3 = ['전체', '한식', '중식', '일식', '양식', '그외'];
@@ -18,6 +21,7 @@ function App() {
 			lng: 126.902435,
 		},
 	});
+
 	useEffect(() => {
 		if (navigator.geolocation) {
 			// GeoLocation을 이용해서 접속 위치를 얻어옵니다
@@ -41,7 +45,7 @@ function App() {
 			if (status === kakao.maps.services.Status.OK) {
 				const arr = { ...result };
 				const _arr = arr[0].address.region_2depth_name;
-				localStorage.setItem('userLocation', _arr);
+				dispatch(changeLocation(_arr));
 			}
 		};
 		geocoder.coord2Address(coord.getLng(), coord.getLat(), callback);
@@ -49,7 +53,8 @@ function App() {
 	const showMenu = () => {
 		if (userPick1 !== '' && userPick2 !== '' && userPick3 !== '') {
 			setIsPicked(true);
-			localStorage.setItem('userMenu', userMenu);
+			// localStorage.setItem('userMenu', userMenu);
+			dispatch(changeMenu(userMenu));
 		} else {
 			alert('메뉴를 선택해주세요');
 		}

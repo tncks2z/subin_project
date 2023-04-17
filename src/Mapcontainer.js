@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Container, Badge } from 'react-bootstrap';
 import './App.css';
-
+import { useSelector } from 'react-redux';
 const { kakao } = window;
+
 const MapContainer = ({ searchPlace }) => {
+	const store = useSelector((state) => state);
 	const [userPlace, setUserPlace] = useState([]);
 	useEffect(() => {
 		const container = document.getElementById('myMap');
 		const options = {
 			center: new kakao.maps.LatLng(33.450701, 126.570667),
-			level: 5,
+			level: 3,
 		};
 		const map = new kakao.maps.Map(container, options);
 
 		const ps = new kakao.maps.services.Places();
 
-		ps.keywordSearch(searchPlace, placesSearchCB);
+		ps.keywordSearch(`${store.searchResult.location} + ${store.searchResult.menu}`, placesSearchCB);
 
 		function placesSearchCB(data, status, pagination) {
 			if (status === kakao.maps.services.Status.OK) {
@@ -26,7 +28,6 @@ const MapContainer = ({ searchPlace }) => {
 				}
 				map.setBounds(bounds);
 				setUserPlace(data);
-				console.log(data);
 			}
 		}
 		function displayMarker(place) {
@@ -50,16 +51,7 @@ const MapContainer = ({ searchPlace }) => {
 
 	return (
 		<>
-			{userPlace.length > 0 ? (
-				<SearchList userPlace={userPlace} />
-			) : (
-				<div
-					style={{
-						width: '30%',
-						height: '800px',
-						float: 'left',
-					}}></div>
-			)}
+			<SearchList userPlace={userPlace} />
 			<div
 				id='myMap'
 				style={{
@@ -77,7 +69,9 @@ function SearchList({ userPlace }) {
 				return (
 					<div className='placeInfo' key={index}>
 						<h5>{place.place_name}</h5>
-						<span></span>
+						<span>전화번호 : {place.phone}</span>
+						<br />
+						<span>주소 : {place.road_address_name}</span>
 					</div>
 				);
 			})}
