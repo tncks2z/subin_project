@@ -2,9 +2,9 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import './App.css';
-import SearchPlace from './Searchplace';
-import { changeLocation, changeMenu } from './store';
-import { useDispatch } from 'react-redux';
+import { changeLocation, changeMenu, changeLatitude, changeLongitude } from './store';
+import { useDispatch, useSelector } from 'react-redux';
+import SearchResult from './Searchresult';
 const { kakao } = window;
 function App() {
 	const dispatch = useDispatch();
@@ -15,52 +15,53 @@ function App() {
 	const [userPick2, setUserPick2] = useState('');
 	const [userPick3, setUserPick3] = useState('');
 	const [isPicked, setIsPicked] = useState(false);
-	const [state, setState] = useState({
+	const [coordinate, setCoordinate] = useState({
 		center: {
 			lat: 37.483034,
 			lng: 126.902435,
 		},
 	});
-
+	const store = useSelector((state) => state);
 	useEffect(() => {
+		function getAddr(lat, lng) {
+			// 주소-좌표 변환 객체를 생성합니다
+			let geocoder = new kakao.maps.services.Geocoder();
+
+			let coord = new kakao.maps.LatLng(lat, lng);
+			let callback = function (result, status) {
+				if (status === kakao.maps.services.Status.OK) {
+					const arr = { ...result };
+					const _arr = arr[0].address.region_2depth_name;
+					dispatch(changeLocation(_arr));
+				}
+			};
+			geocoder.coord2Address(coord.getLng(), coord.getLat(), callback);
+		}
 		if (navigator.geolocation) {
 			// GeoLocation을 이용해서 접속 위치를 얻어옵니다
 			navigator.geolocation.getCurrentPosition((position) => {
-				setState({
+				setCoordinate({
 					center: {
 						lat: position.coords.latitude, // 위도
 						lng: position.coords.longitude, // 경도;
 					},
 				});
+				dispatch(changeLatitude(position.coords.latitude));
+				dispatch(changeLongitude(position.coords.longitude));
 			});
 		}
-		getAddr(state.center.lat, state.center.lng);
-	}, [state.center.lat, state.center.lng]);
-	function getAddr(lat, lng) {
-		// 주소-좌표 변환 객체를 생성합니다
-		let geocoder = new kakao.maps.services.Geocoder();
-
-		let coord = new kakao.maps.LatLng(lat, lng);
-		let callback = function (result, status) {
-			if (status === kakao.maps.services.Status.OK) {
-				const arr = { ...result };
-				const _arr = arr[0].address.region_2depth_name;
-				dispatch(changeLocation(_arr));
-			}
-		};
-		geocoder.coord2Address(coord.getLng(), coord.getLat(), callback);
-	}
+		getAddr(coordinate.center.lat, coordinate.center.lng);
+	}, [coordinate.center.lat, coordinate.center.lng]);
 	const showMenu = () => {
 		if (userPick1 !== '' && userPick2 !== '' && userPick3 !== '') {
 			setIsPicked(true);
-			// localStorage.setItem('userMenu', userMenu);
 			dispatch(changeMenu(userMenu));
 		} else {
 			alert('메뉴를 선택해주세요');
 		}
 	};
 	const navigate = useNavigate();
-	const userMenu = '콩나물 국밥';
+	const userMenu = store.locationMenu.menu;
 	return (
 		<div className='App'>
 			<Routes>
@@ -87,7 +88,7 @@ function App() {
 							) : null}
 						</Container>
 					}></Route>
-				<Route path='/map' element={<SearchPlace />}></Route>
+				<Route path='/map' element={<SearchResult />}></Route>
 			</Routes>
 		</div>
 	);

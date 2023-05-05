@@ -42,4 +42,8 @@ div {
 .placeInfo {
 	border-bottom: 1px solid #eee;
 	padding: 10px;
+	padding-left: 20px;
+}
+.placeInfo span {
+	font-size: 15px;
 }
